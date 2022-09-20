@@ -6,7 +6,7 @@ import pytz
 
 from datetime import datetime
 
-from binance.exceptions import UnknownDateFormat
+from .exceptions import UnknownDateFormat
 
 
 def date_to_milliseconds(date_str: str) -> int:

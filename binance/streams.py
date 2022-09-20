@@ -11,6 +11,7 @@ from typing import Optional, List, Dict, Callable, Any
 
 import websockets as ws
 from websockets.exceptions import ConnectionClosedError
+logging.getLogger('websockets').setLevel(logging.INFO)
 
 from .client import AsyncClient
 from .enums import FuturesType
@@ -165,7 +166,7 @@ class ReconnectingWebsocket:
                     self._log.debug(f"BinanceWebsocketUnableToConnect ({e})")
                     break
                 except Exception as e:
-                    self._log.debug(f"Unknown exception ({e})")
+                    self._log.debug(f"Unknown exception ({e}) ({res})")
                     continue
         finally:
             self._handle_read_loop = None  # Signal the coro is stopped
@@ -301,7 +302,7 @@ class BinanceSocketManager:
     FSTREAM_TESTNET_URL = 'wss://stream.binancefuture.com/'
     DSTREAM_URL = 'wss://dstream.binance.{}/'
     DSTREAM_TESTNET_URL = 'wss://dstream.binancefuture.com/'
-    VSTREAM_URL = 'wss://vstream.binance.{}/'
+    VSTREAM_URL = 'wss://nbstream.binance.{}/eoptions/'
     VSTREAM_TESTNET_URL = 'wss://testnetws.binanceops.{}/'
 
     WEBSOCKET_DEPTH_5 = '5'
@@ -385,7 +386,7 @@ class BinanceSocketManager:
         stream_url = self.VSTREAM_URL
         if self.testnet:
             stream_url = self.VSTREAM_TESTNET_URL
-        return self._get_socket(path, stream_url, prefix, is_binary=True, socket_type=BinanceSocketType.OPTIONS)
+        return self._get_socket(path, stream_url, prefix, is_binary=False, socket_type=BinanceSocketType.OPTIONS)
 
     async def _exit_socket(self, path: str):
         await self._stop_socket(path)
@@ -1003,7 +1004,7 @@ class BinanceSocketManager:
         """Start a multiplexed socket using a list of socket names.
         User stream sockets can not be included.
 
-        Symbols in socket name must be lowercase i.e bnbbtc@aggTrade, neobtc@ticker
+        Symbols in socket name must be uppercase
 
         Combined stream events are wrapped as follows: {"stream":"<streamName>","data":<rawPayload>}
 
@@ -1017,8 +1018,9 @@ class BinanceSocketManager:
         Message Format - see Binance API docs for all types
 
         """
-        stream_name = '/'.join([s.lower() for s in streams])
+        stream_name = '/'.join([s for s in streams])
         stream_path = f'streams={stream_name}'
+        print(stream_path)
         return self._get_options_socket(stream_path, prefix='stream?')
 
     def futures_multiplex_socket(self, streams: List[str], futures_type: FuturesType = FuturesType.USD_M):
@@ -1124,7 +1126,7 @@ class BinanceSocketManager:
         :param symbol: required
         :type symbol: str
         """
-        return self._get_options_socket(symbol.lower() + '@ticker')
+        return self._get_options_socket(symbol + '@ticker')
 
     def options_recent_trades_socket(self, symbol: str):
         """Subscribe to a latest completed trades stream
@@ -1134,7 +1136,7 @@ class BinanceSocketManager:
         :param symbol: required
         :type symbol: str
         """
-        return self._get_options_socket(symbol.lower() + '@trade')
+        return self._get_options_socket(symbol + '@trade')
 
     def options_kline_socket(self, symbol: str, interval=AsyncClient.KLINE_INTERVAL_1MINUTE):
         """Subscribe to a candlestick data stream
@@ -1146,7 +1148,7 @@ class BinanceSocketManager:
         :param interval: Kline interval, default KLINE_INTERVAL_1MINUTE
         :type interval: str
         """
-        return self._get_options_socket(symbol.lower() + '@kline_' + interval)
+        return self._get_options_socket(symbol + '@kline_' + interval)
 
     def options_depth_socket(self, symbol: str, depth: str = '10'):
         """Subscribe to a depth data stream
@@ -1158,7 +1160,7 @@ class BinanceSocketManager:
         :param depth: optional Number of depth entries to return, default 10.
         :type depth: str
         """
-        return self._get_options_socket(symbol.lower() + '@depth' + str(depth))
+        return self._get_options_socket(symbol + '@depth' + str(depth))
 
     async def _stop_socket(self, conn_key):
         """Stop a websocket given the connection key
