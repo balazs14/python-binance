@@ -1141,7 +1141,7 @@ class BinanceSocketManager:
         :param symbol: required
         :type symbol: str
         """
-        return self._get_options_socket(symbol.lower() + '@ticker')
+        return self._get_options_socket(symbol + '@ticker')
 
     def options_ticker_by_expiration_socket(self, symbol: str, expiration_date: str):
         """Subscribe to a 24 hour ticker info stream
