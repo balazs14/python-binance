@@ -460,7 +460,7 @@ class Client(BaseClient):
     def get_symbol_info(self, symbol) -> Optional[Dict]:
         """Return information about a symbol
 
-        :param symbol: required e.g BNBBTC
+        :param symbol: required e.g. BNBBTC
         :type symbol: str
 
         :returns: Dict if found, None if not
@@ -569,13 +569,15 @@ class Client(BaseClient):
         """
         return self._get('ticker/price', version=self.PRIVATE_API_VERSION)
 
-    def get_orderbook_tickers(self) -> Dict:
+    def get_orderbook_tickers(self, **params) -> Dict:
         """Best price/qty on the order book for all symbols.
 
         https://binance-docs.github.io/apidocs/spot/en/#symbol-order-book-ticker
 
         :param symbol: optional
         :type symbol: str
+        :param symbols: optional accepted format  ["BTCUSDT","BNBUSDT"] or %5B%22BTCUSDT%22,%22BNBUSDT%22%5D
+        :type symbols: str
 
         :returns: List of order book market entries
 
@@ -601,7 +603,12 @@ class Client(BaseClient):
         :raises: BinanceRequestException, BinanceAPIException
 
         """
-        return self._get('ticker/bookTicker', version=self.PRIVATE_API_VERSION)
+        data = {}
+        if "symbol" in params:
+            data["symbol"] = params["symbol"]
+        elif "symbols" in params:
+            data["symbols"] = params["symbols"]
+        return self._get('ticker/bookTicker', data=data, version=self.PRIVATE_API_VERSION)
 
     def get_order_book(self, **params) -> Dict:
         """Get the Order Book for the market
@@ -888,9 +895,9 @@ class Client(BaseClient):
             raise NotImplementedException(klines_type)
 
     def _get_earliest_valid_timestamp(self, symbol, interval, klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
-        """Get earliest valid open timestamp from Binance
+        """Get the earliest valid open timestamp from Binance
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -914,7 +921,7 @@ class Client(BaseClient):
                               klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
         """Get Historical Klines from Binance
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -938,11 +945,11 @@ class Client(BaseClient):
                            klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
         """Get Historical Klines from Binance (spot or futures)
 
-        See dateparser docs for valid start and end string formats http://dateparser.readthedocs.io/en/latest/
+        See dateparser docs for valid start and end string formats https://dateparser.readthedocs.io/en/latest/
 
         If using offset strings for dates add "UTC" to date string e.g. "now UTC", "11 hours ago UTC"
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -1017,7 +1024,7 @@ class Client(BaseClient):
                                         klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
         """Get Historical Klines generator from Binance
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -1040,11 +1047,11 @@ class Client(BaseClient):
                                      klines_type: HistoricalKlinesType = HistoricalKlinesType.SPOT):
         """Get Historical Klines generator from Binance (spot or futures)
 
-        See dateparser docs for valid start and end string formats http://dateparser.readthedocs.io/en/latest/
+        See dateparser docs for valid start and end string formats https://dateparser.readthedocs.io/en/latest/
 
         If using offset strings for dates add "UTC" to date string e.g. "now UTC", "11 hours ago UTC"
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -1925,7 +1932,7 @@ class Client(BaseClient):
 
         """
         return self._get('openOrders', True, data=params)
-    
+
     def get_open_oco_orders(self, **params):
         """Get all open orders on a symbol.
         https://binance-docs.github.io/apidocs/spot/en/#query-open-oco-user_data
@@ -1959,7 +1966,7 @@ class Client(BaseClient):
         :raises: BinanceRequestException, BinanceAPIException
         """
         return self._get('openOrderList', True, data=params)
-    
+
     # User Stream Endpoints
     def get_account(self, **params):
         """Get current account information.
@@ -2318,7 +2325,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             result = client.transfer_dust(asset='ONE')
 
@@ -2360,7 +2367,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             result = client.get_asset_dividend_history()
 
@@ -2407,7 +2414,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer_status = client.make_universal_transfer(params)
 
@@ -2443,7 +2450,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer_status = client.query_universal_transfer_history(params)
 
@@ -3065,7 +3072,7 @@ class Client(BaseClient):
         :param asset: name of the asset
         :type asset: str
 
-        .. code:: python
+        .. code-block:: python
 
             asset_details = client.get_margin_asset(asset='BNB')
 
@@ -3385,7 +3392,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer = client.transfer_margin_to_spot(asset='BTC', amount='1.1')
 
@@ -3415,7 +3422,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer = client.transfer_spot_to_margin(asset='BTC', amount='1.1')
 
@@ -3447,7 +3454,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer = client.transfer_isolated_margin_to_spot(asset='BTC',
                                                                 symbol='ETHBTC', amount='1.1')
@@ -3481,7 +3488,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer = client.transfer_spot_to_isolated_margin(asset='BTC',
                                                                 symbol='ETHBTC', amount='1.1')
@@ -3525,7 +3532,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transfer = client.transfer_spot_to_isolated_margin(symbol='ETHBTC')
 
@@ -3578,7 +3585,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transaction = client.margin_create_loan(asset='BTC', amount='1.1')
 
@@ -3616,7 +3623,7 @@ class Client(BaseClient):
         :param recvWindow: the number of milliseconds the request is valid for
         :type recvWindow: int
 
-        .. code:: python
+        .. code-block:: python
 
             transaction = client.margin_repay_loan(asset='BTC', amount='1.1')
 
@@ -5916,7 +5923,7 @@ class Client(BaseClient):
     def futures_historical_klines(self, symbol, interval, start_str, end_str=None, limit=500):
         """Get historical futures klines from Binance
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -5935,7 +5942,7 @@ class Client(BaseClient):
     def futures_historical_klines_generator(self, symbol, interval, start_str, end_str=None):
         """Get historical futures klines generator from Binance
 
-        :param symbol: Name of symbol pair e.g BNBBTC
+        :param symbol: Name of symbol pair e.g. BNBBTC
         :type symbol: str
         :param interval: Binance Kline interval
         :type interval: str
@@ -7384,7 +7391,7 @@ class AsyncClient(BaseClient):
     ):
 
         self.loop = loop or asyncio.get_event_loop()
-        self._session_params = session_params
+        self._session_params: Dict[str, str] = session_params or {}
         super().__init__(api_key, api_secret, requests_params, tld, testnet)
 
     @classmethod
@@ -7535,8 +7542,13 @@ class AsyncClient(BaseClient):
         return await self._get('ticker/price', version=self.PRIVATE_API_VERSION, data=params)
     get_all_tickers.__doc__ = Client.get_all_tickers.__doc__
 
-    async def get_orderbook_tickers(self) -> Dict:
-        return await self._get('ticker/bookTicker', version=self.PRIVATE_API_VERSION)
+    async def get_orderbook_tickers(self, **params) -> Dict:
+        data = {}
+        if "symbol" in params:
+            data["symbol"] = params["symbol"]
+        elif "symbols" in params:
+            data["symbols"] = params["symbols"]
+        return await self._get('ticker/bookTicker', data=data, version=self.PRIVATE_API_VERSION)
     get_orderbook_tickers.__doc__ = Client.get_orderbook_tickers.__doc__
 
     async def get_order_book(self, **params) -> Dict:
