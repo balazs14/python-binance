@@ -1141,7 +1141,7 @@ class BinanceSocketManager:
         :type symbol: str
         """
         return self._get_options_socket(symbol.lower() + '@ticker')
-    
+
     def options_ticker_by_expiration_socket(self, symbol: str, expiration_date: str):
         """Subscribe to a 24 hour ticker info stream
         https://binance-docs.github.io/apidocs/voptions/en/#24-hour-ticker-by-underlying-asset-and-expiration-data
@@ -1151,7 +1151,7 @@ class BinanceSocketManager:
         :type expiration_date: str
         """
         return self._get_options_socket(symbol.lower() + '@ticker@' + expiration_date)
-    
+
     def options_recent_trades_socket(self, symbol: str):
         """Subscribe to a latest completed trades stream
 
@@ -1493,7 +1493,7 @@ class ThreadedWebsocketManager(ThreadedApiManager):
                 'symbol': symbol
             }
         )
-    
+
     def start_options_ticker_by_expiration_socket(self, callback: Callable, symbol: str, expiration_date: str) -> str:
         return self._start_async_socket(
             callback=callback,
@@ -1503,7 +1503,7 @@ class ThreadedWebsocketManager(ThreadedApiManager):
                 'expiration_date': expiration_date
             }
         )
-    
+
     def start_options_recent_trades_socket(self, callback: Callable, symbol: str) -> str:
         return self._start_async_socket(
             callback=callback,
