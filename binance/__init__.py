@@ -4,7 +4,7 @@
 
 """
 
-__version__ = "1.0.18"
+__version__ = "1.0.19"
 
 from .client import Client, AsyncClient  # noqa
 from .depthcache import DepthCacheManager, OptionsDepthCacheManager, ThreadedDepthCacheManager  # noqa
